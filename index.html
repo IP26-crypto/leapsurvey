@@ -1,0 +1,1163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Leap Beta</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+
+<style>
+/* ── PASTE YOUR SUPABASE KEYS AT THE TOP OF THE <script> BLOCK BELOW ── */
+:root {
+  --bg: #f2f2f0;
+  --white: #ffffff;
+  --black: #0a0a0a;
+  --green: #2d6a2d;
+  --green-dark: #1e4a1e;
+  --green-light: #e8f0e8;
+  --red-dot: #e05050;
+  --gray: #888888;
+  --gray-light: #c8c8c8;
+  --border: #e0ddd8;
+  --text: #111111;
+  --text-muted: #777777;
+  --text-label: #999999;
+  --r: 14px;
+  --r-sm: 10px;
+  --r-lg: 20px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+.view{display:none;min-height:100vh;flex-direction:column}
+.view.active{display:flex}
+
+/* NAV */
+.topnav{display:flex;align-items:center;justify-content:space-between;padding:14px 24px;background:var(--white);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:50}
+.nav-logo{display:flex;align-items:center;gap:10px}
+.nav-logo-name{font-size:16px;font-weight:800;letter-spacing:-0.3px}
+.nav-logo-sub{font-size:9px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--text-label);display:block;margin-top:1px}
+.nav-right{display:flex;gap:10px;align-items:center}
+
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:10px 20px;border-radius:30px;font-family:'Inter',sans-serif;font-size:13px;font-weight:600;cursor:pointer;border:none;transition:all 0.15s}
+.btn-green{background:var(--green);color:#fff}
+.btn-green:hover{background:var(--green-dark)}
+.btn-outline{background:transparent;border:1.5px solid var(--border);color:var(--text);padding:8px 18px}
+.btn-outline:hover{border-color:var(--gray-light);background:var(--bg)}
+.btn-black{background:var(--black);color:#fff;border-radius:var(--r-sm)}
+.btn-black:hover{background:#222}
+.btn-full{width:100%;border-radius:var(--r-sm);padding:14px;font-size:15px;font-weight:700;letter-spacing:0.5px;text-transform:uppercase}
+.btn:disabled{opacity:0.4;cursor:not-allowed}
+
+/* SIGNUP */
+#view-signup{background:var(--bg)}
+.signup-page{flex:1;display:flex;flex-direction:column;align-items:center;padding:48px 20px 60px}
+.signup-hero{text-align:center;margin-bottom:36px;max-width:480px}
+.signup-frog{width:56px;height:56px;margin:0 auto 16px}
+.signup-eyebrow{font-size:11px;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;color:var(--green);margin-bottom:12px}
+.signup-h1{font-size:clamp(32px,6vw,52px);font-weight:900;letter-spacing:-1.5px;line-height:1.05;color:var(--black);margin-bottom:14px}
+.signup-sub{font-size:15px;color:var(--text-muted);line-height:1.6}
+.signup-card{background:var(--white);border:1px solid var(--border);border-radius:var(--r-lg);padding:28px;width:100%;max-width:420px}
+.signup-card-hd{font-size:17px;font-weight:800;letter-spacing:-0.3px;margin-bottom:4px}
+.signup-card-sub{font-size:13px;color:var(--text-muted);margin-bottom:22px}
+.steps{display:flex;gap:5px;margin-bottom:20px}
+.step-dot{height:3px;border-radius:2px;background:var(--border);flex:1;transition:background 0.2s}
+.step-dot.on{background:var(--green)}
+.f{margin-bottom:14px}
+.f label{display:block;font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--text-label);margin-bottom:6px}
+.f input,.f select{width:100%;padding:12px 14px;background:var(--green-light);border:1.5px solid transparent;border-radius:var(--r-sm);font-family:'Inter',sans-serif;font-size:14px;color:var(--black);outline:none;transition:border-color 0.15s,background 0.15s}
+.f input:focus,.f select:focus{border-color:var(--green);background:#fff}
+.f input::placeholder{color:var(--gray-light)}
+.f select option{background:#fff}
+.f.err input,.f.err select{border-color:#e05050;background:#fff5f5}
+.f-err{font-size:11px;color:#e05050;margin-top:4px;display:none}
+.f.err .f-err{display:block}
+.two-f{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.done-wrap{text-align:center;padding:8px 0}
+.done-circle{width:60px;height:60px;border-radius:50%;background:var(--green-light);border:2px solid var(--green);display:flex;align-items:center;justify-content:center;margin:0 auto 16px}
+.done-title{font-size:22px;font-weight:900;letter-spacing:-0.5px;margin-bottom:8px}
+.done-sub{font-size:13px;color:var(--text-muted);line-height:1.6}
+.text-btn{background:none;border:none;font-size:12px;color:var(--text-muted);cursor:pointer;font-family:'Inter',sans-serif;margin-top:14px;display:block;width:100%;text-align:center}
+.text-btn:hover{color:var(--text)}
+.back-link{background:none;border:none;font-size:13px;color:var(--text-muted);cursor:pointer;font-family:'Inter',sans-serif;margin-top:12px;display:block;width:100%;text-align:center}
+
+/* SURVEY */
+#view-survey{background:var(--bg)}
+.survey-page{flex:1;display:flex;flex-direction:column;align-items:center;padding:32px 20px 60px}
+.survey-inner{width:100%;max-width:520px}
+.survey-hdr{text-align:center;margin-bottom:36px}
+.survey-tag{display:inline-block;background:var(--green-light);color:var(--green);font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;padding:5px 12px;border-radius:20px;margin-bottom:14px}
+.survey-hdr h2{font-size:26px;font-weight:900;letter-spacing:-0.5px;margin-bottom:6px}
+.survey-hdr p{font-size:14px;color:var(--text-muted)}
+.sv-card{background:var(--white);border:1px solid var(--border);border-radius:var(--r-lg);padding:22px;margin-bottom:12px}
+.q-num-tag{font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--green);margin-bottom:6px}
+.q-text{font-size:15px;font-weight:700;margin-bottom:14px;line-height:1.4}
+.q-textarea{width:100%;padding:12px 14px;background:var(--green-light);border:1.5px solid transparent;border-radius:var(--r-sm);font-family:'Inter',sans-serif;font-size:14px;color:var(--black);outline:none;resize:vertical;min-height:90px;transition:border-color 0.15s}
+.q-textarea:focus{border-color:var(--green);background:#fff}
+.q-textarea::placeholder{color:var(--gray-light)}
+.rating-row{display:flex;gap:8px}
+.r-btn{flex:1;padding:12px 4px;border-radius:var(--r-sm);background:var(--green-light);border:1.5px solid transparent;font-size:14px;font-weight:700;color:var(--text);cursor:pointer;transition:all 0.12s;font-family:'Inter',sans-serif}
+.r-btn:hover{border-color:var(--green);background:#fff}
+.r-btn.sel{background:var(--green);color:#fff;border-color:var(--green)}
+.rating-labels{display:flex;justify-content:space-between;font-size:10px;color:var(--text-muted);margin-top:6px;font-weight:500}
+.scale-row{display:flex;gap:5px;flex-wrap:wrap}
+.sc-btn{width:44px;height:44px;border-radius:var(--r-sm);background:var(--green-light);border:1.5px solid transparent;font-size:13px;font-weight:700;color:var(--text);cursor:pointer;transition:all 0.12s;font-family:'Inter',sans-serif}
+.sc-btn:hover{border-color:var(--green)}
+.sc-btn.sel{background:var(--green);color:#fff;border-color:var(--green)}
+.choice-list{display:flex;flex-direction:column;gap:8px}
+.c-btn{padding:13px 16px;border-radius:var(--r-sm);background:var(--green-light);border:1.5px solid transparent;font-size:14px;font-weight:500;color:var(--text);cursor:pointer;text-align:left;font-family:'Inter',sans-serif;transition:all 0.12s}
+.c-btn:hover{border-color:var(--green);background:#fff}
+.c-btn.sel{border-color:var(--green);background:var(--white);font-weight:700}
+
+/* LOCK */
+#view-lock{background:var(--bg);align-items:center;justify-content:center}
+.lock-wrap{background:var(--white);border:1px solid var(--border);border-radius:var(--r-lg);padding:36px 32px;width:340px;text-align:center}
+.lock-frog{width:44px;height:44px;margin:0 auto 14px}
+.lock-title{font-size:20px;font-weight:900;letter-spacing:-0.4px;margin-bottom:6px}
+.lock-sub{font-size:13px;color:var(--text-muted);margin-bottom:24px;line-height:1.5}
+.lock-in{width:100%;padding:12px 14px;background:var(--green-light);border:1.5px solid transparent;border-radius:var(--r-sm);font-family:'Inter',sans-serif;font-size:15px;color:var(--black);outline:none;text-align:center;letter-spacing:3px}
+.lock-in:focus{border-color:var(--green);background:#fff}
+.pw-err{font-size:12px;color:#e05050;margin-top:8px;display:none}
+.lock-hint{font-size:11px;color:var(--text-label);margin-top:14px}
+
+/* ADMIN */
+#view-admin{background:var(--bg);flex-direction:row}
+.sidebar{width:220px;flex-shrink:0;background:var(--white);border-right:1px solid var(--border);display:flex;flex-direction:column;padding:0;position:sticky;top:0;height:100vh;overflow-y:auto}
+.sb-header{padding:18px 18px 16px;border-bottom:1px solid var(--border)}
+.sb-logo{display:flex;align-items:center;gap:8px}
+.sb-logo-img{width:26px;height:26px}
+.sb-logo-name{font-size:15px;font-weight:900;letter-spacing:-0.3px}
+.sb-logo-tag{font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--text-label);display:block}
+.sb-section{padding:16px 16px 4px;font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--text-label)}
+.sb-btn{display:flex;align-items:center;gap:10px;width:100%;padding:10px 16px;background:transparent;border:none;color:var(--text-muted);font-family:'Inter',sans-serif;font-size:13px;font-weight:500;cursor:pointer;text-align:left;transition:all 0.1s;border-left:2.5px solid transparent}
+.sb-btn:hover{color:var(--text);background:var(--bg)}
+.sb-btn.active{color:var(--green);border-left-color:var(--green);background:var(--green-light);font-weight:600}
+.sb-icon{width:15px;height:15px;flex-shrink:0;opacity:0.5}
+.sb-btn.active .sb-icon,.sb-btn:hover .sb-icon{opacity:1}
+.sb-spacer{flex:1}
+.sb-bottom{padding:12px 8px}
+.admin-main{flex:1;overflow-y:auto;padding:32px 36px;background:var(--bg)}
+.panel{display:none}
+.panel.active{display:block}
+.page-hd{font-size:26px;font-weight:900;letter-spacing:-0.5px;margin-bottom:4px}
+.page-sub{font-size:13px;color:var(--text-muted);margin-bottom:26px}
+.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:24px}
+.stat{background:var(--white);border:1px solid var(--border);border-radius:var(--r);padding:16px 18px}
+.stat-label{font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--text-label);margin-bottom:6px}
+.stat-val{font-size:28px;font-weight:900;letter-spacing:-1px;color:var(--black)}
+.stat-sub{font-size:11px;color:var(--text-label);margin-top:3px}
+.ac{background:var(--white);border:1px solid var(--border);border-radius:var(--r);padding:20px;margin-bottom:14px}
+.ac-title{font-size:14px;font-weight:700;margin-bottom:3px}
+.ac-sub{font-size:12px;color:var(--text-muted);margin-bottom:16px}
+.ac-dashed{border-style:dashed;background:var(--bg)}
+.af{margin-bottom:12px}
+.af label{display:block;font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--text-label);margin-bottom:5px}
+.af input,.af select,.af textarea{width:100%;padding:9px 12px;background:var(--green-light);border:1.5px solid transparent;border-radius:var(--r-sm);font-family:'Inter',sans-serif;font-size:13px;color:var(--black);outline:none}
+.af input:focus,.af select:focus,.af textarea:focus{border-color:var(--green);background:#fff}
+.af input::placeholder,.af textarea::placeholder{color:var(--gray-light)}
+.af select option{background:#fff}
+.af textarea{resize:vertical;min-height:70px}
+.two-af{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.ab{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:30px;font-family:'Inter',sans-serif;font-size:12px;font-weight:600;cursor:pointer;border:1.5px solid var(--border);background:transparent;color:var(--text-muted);transition:all 0.12s}
+.ab:hover{border-color:var(--gray-light);color:var(--text);background:var(--bg)}
+.ab-green{background:var(--green);border-color:var(--green);color:#fff;border-radius:var(--r-sm)}
+.ab-green:hover{background:var(--green-dark)}
+.ab-green:disabled{opacity:0.4;cursor:not-allowed}
+.ab-sm{padding:5px 12px;font-size:11px}
+.ab-danger{color:#e05050;border-color:transparent}
+.ab-danger:hover{background:#fff5f5;border-color:#fca5a5;color:#c03030}
+.tbl-wrap{overflow-x:auto;border-radius:var(--r);border:1px solid var(--border);background:var(--white)}
+table{width:100%;border-collapse:collapse;font-size:12px}
+th{text-align:left;padding:9px 14px;font-size:9px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--text-label);border-bottom:1px solid var(--border);background:var(--bg)}
+td{padding:10px 14px;border-bottom:1px solid var(--border);vertical-align:middle}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:#fafaf8}
+.badge{display:inline-block;padding:3px 9px;border-radius:20px;font-size:10px;font-weight:700}
+.b-green{background:var(--green-light);color:var(--green)}
+.b-gray{background:var(--bg);color:var(--text-muted);border:1px solid var(--border)}
+.av{width:30px;height:30px;border-radius:10px;background:var(--green-light);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:var(--green);flex-shrink:0}
+.q-item-a{display:flex;align-items:flex-start;gap:10px;padding:11px 14px;border:1px solid var(--border);border-radius:var(--r-sm);margin-bottom:7px;background:var(--white)}
+.q-n{width:22px;height:22px;background:var(--green-light);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;color:var(--green);flex-shrink:0;margin-top:2px}
+.chip{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;background:var(--green-light);border-radius:20px;font-size:12px;margin:2px;color:var(--green);font-weight:500}
+.chip-rm{background:none;border:none;cursor:pointer;color:var(--green);font-size:14px;padding:0;line-height:1;opacity:0.6}
+.chip-rm:hover{opacity:1}
+.ins-bar-row{display:flex;align-items:center;gap:10px;margin-bottom:8px;font-size:12px}
+.ins-bar-label{min-width:90px;color:var(--text);font-weight:500}
+.ins-bar-track{flex:1;height:8px;background:var(--green-light);border-radius:4px;overflow:hidden}
+.ins-bar-fill{height:100%;background:var(--green);border-radius:4px;transition:width 0.4s}
+.ins-bar-ct{min-width:24px;text-align:right;color:var(--text-muted)}
+.avg-big{font-size:36px;font-weight:900;letter-spacing:-1px;color:var(--green)}
+.prog-t{height:5px;background:var(--green-light);border-radius:3px;overflow:hidden;margin-top:6px}
+.prog-tf{height:100%;background:var(--green);border-radius:3px}
+.blast-row{display:flex;align-items:center;gap:10px;padding:9px 12px;background:var(--bg);border-radius:var(--r-sm);margin-bottom:6px;border:1px solid var(--border)}
+.blast-row input[type=checkbox]{accent-color:var(--green);width:15px;height:15px;cursor:pointer;flex-shrink:0}
+.sv-row{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--border)}
+.sv-row:last-child{border-bottom:none}
+.divider{height:1px;background:var(--border);margin:16px 0}
+.empty{text-align:center;padding:32px;color:var(--text-muted);font-size:13px}
+.live-dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:#e05050;margin-right:5px;animation:blink 1.4s infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0.3}}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--black);color:#fff;padding:10px 22px;border-radius:30px;font-size:13px;font-weight:500;z-index:9999;opacity:0;transition:opacity 0.2s;pointer-events:none;white-space:nowrap}
+.toast.show{opacity:1}
+.loading-overlay{position:fixed;inset:0;background:rgba(242,242,240,0.85);display:flex;align-items:center;justify-content:center;z-index:200;font-size:14px;color:var(--text-muted);font-weight:500;display:none}
+.loading-overlay.show{display:flex}
+.spinner{width:20px;height:20px;border:2px solid var(--border);border-top-color:var(--green);border-radius:50%;animation:spin 0.7s linear infinite;margin-right:10px}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* setup screen */
+.setup-screen{flex:1;display:flex;align-items:center;justify-content:center;padding:40px 20px}
+.setup-card{background:var(--white);border:1px solid var(--border);border-radius:var(--r-lg);padding:36px;max-width:560px;width:100%}
+.setup-step{display:flex;gap:14px;margin-bottom:22px;padding-bottom:22px;border-bottom:1px solid var(--border)}
+.setup-step:last-child{border-bottom:none;margin-bottom:0;padding-bottom:0}
+.setup-num{width:28px;height:28px;background:var(--green);color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;flex-shrink:0;margin-top:2px}
+.setup-step-title{font-size:14px;font-weight:700;margin-bottom:4px}
+.setup-step-desc{font-size:13px;color:var(--text-muted);line-height:1.6}
+.setup-step-desc code{background:var(--green-light);color:var(--green);padding:1px 6px;border-radius:4px;font-family:monospace;font-size:12px}
+.setup-step-desc a{color:var(--green);font-weight:600}
+
+@media(max-width:700px){
+  .stats-row{grid-template-columns:1fr 1fr}
+  .two-f,.two-af{grid-template-columns:1fr}
+  .sidebar{display:none}
+  .admin-main{padding:20px}
+}
+</style>
+</head>
+<body>
+
+<div class="toast" id="toast"></div>
+<div class="loading-overlay" id="loader"><div class="spinner"></div><span id="loader-msg">Loading...</span></div>
+
+<!-- ── NAV ── -->
+<nav class="topnav" id="main-nav">
+  <div class="nav-logo">
+    <svg width="30" height="30" viewBox="0 0 100 100" fill="none">
+      <path d="M15 60 Q20 35 45 30 Q38 50 55 48 Q48 60 60 58 Q65 45 80 30 Q85 28 88 32 Q88 36 82 42 Q70 55 62 70 Q55 80 48 78 Q35 76 28 68 Q20 72 15 60Z" fill="#2d6a2d"/>
+      <circle cx="76" cy="26" r="7" fill="#2d6a2d"/>
+      <circle cx="76" cy="26" r="3" fill="white"/>
+    </svg>
+    <div>
+      <div class="nav-logo-name">Leap</div>
+      <span class="nav-logo-sub">Beta</span>
+    </div>
+  </div>
+  <div class="nav-right">
+    <button class="btn btn-outline" onclick="showView('signup')">Join beta</button>
+    <button class="btn btn-green" onclick="goAdmin()">Admin portal →</button>
+  </div>
+</nav>
+
+<!-- ══════════════════════════════
+     SETUP SCREEN (shown if no keys)
+══════════════════════════════ -->
+<div class="view" id="view-setup">
+  <div class="setup-screen">
+    <div class="setup-card">
+      <div style="text-align:center;margin-bottom:28px">
+        <svg width="44" height="44" viewBox="0 0 100 100" fill="none" style="margin:0 auto 12px;display:block">
+          <path d="M15 60 Q20 35 45 30 Q38 50 55 48 Q48 60 60 58 Q65 45 80 30 Q85 28 88 32 Q88 36 82 42 Q70 55 62 70 Q55 80 48 78 Q35 76 28 68 Q20 72 15 60Z" fill="#2d6a2d"/>
+          <circle cx="76" cy="26" r="7" fill="#2d6a2d"/>
+          <circle cx="76" cy="26" r="3" fill="white"/>
+        </svg>
+        <div style="font-size:20px;font-weight:900;letter-spacing:-0.4px;margin-bottom:6px">One-time setup needed</div>
+        <div style="font-size:13px;color:var(--text-muted)">Connect your free Supabase database to store data permanently.</div>
+      </div>
+
+      <div class="setup-step">
+        <div class="setup-num">1</div>
+        <div>
+          <div class="setup-step-title">Create a free Supabase account</div>
+          <div class="setup-step-desc">Go to <a href="https://supabase.com" target="_blank">supabase.com</a> → click "Start your project" → sign up free. No credit card needed.</div>
+        </div>
+      </div>
+      <div class="setup-step">
+        <div class="setup-num">2</div>
+        <div>
+          <div class="setup-step-title">Create a new project</div>
+          <div class="setup-step-desc">Click "New project", give it a name like <code>leap-beta</code>, set a database password, pick any region. Wait ~1 min for it to spin up.</div>
+        </div>
+      </div>
+      <div class="setup-step">
+        <div class="setup-num">3</div>
+        <div>
+          <div class="setup-step-title">Run this SQL to create your tables</div>
+          <div class="setup-step-desc">In your Supabase project, click <strong>SQL Editor</strong> in the left sidebar, paste the SQL below, and click <strong>Run</strong>:</div>
+          <textarea readonly onclick="this.select()" style="width:100%;margin-top:10px;padding:10px;background:#f8f8f6;border:1px solid var(--border);border-radius:8px;font-family:monospace;font-size:11px;resize:none;height:180px;color:#444;outline:none">-- Run this in Supabase SQL Editor
+CREATE TABLE testers (
+  id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
+  name text, fn text, ln text, email text UNIQUE,
+  yr text, posts text, exc text, note text,
+  joined date DEFAULT CURRENT_DATE
+);
+CREATE TABLE surveys (
+  id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
+  name text, description text,
+  questions jsonb DEFAULT '[]',
+  created date DEFAULT CURRENT_DATE,
+  sent int DEFAULT 0, responses int DEFAULT 0
+);
+CREATE TABLE responses (
+  id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
+  survey_id uuid REFERENCES surveys(id) ON DELETE CASCADE,
+  survey_name text, tester_id uuid, tester_name text,
+  email text, date date DEFAULT CURRENT_DATE,
+  answers jsonb DEFAULT '{}'
+);
+ALTER TABLE testers ENABLE ROW LEVEL SECURITY;
+ALTER TABLE surveys ENABLE ROW LEVEL SECURITY;
+ALTER TABLE responses ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "public_all" ON testers FOR ALL USING (true) WITH CHECK (true);
+CREATE POLICY "public_all" ON surveys FOR ALL USING (true) WITH CHECK (true);
+CREATE POLICY "public_all" ON responses FOR ALL USING (true) WITH CHECK (true);</textarea>
+        </div>
+      </div>
+      <div class="setup-step">
+        <div class="setup-num">4</div>
+        <div>
+          <div class="setup-step-title">Paste your project URL and anon key below</div>
+          <div class="setup-step-desc">In Supabase go to <strong>Project Settings → API</strong>. Copy your <code>Project URL</code> and <code>anon public</code> key.</div>
+          <div style="margin-top:12px">
+            <div class="af"><label>Project URL</label><input id="setup-url" placeholder="https://xxxxxxxxxxxx.supabase.co"/></div>
+            <div class="af"><label>Anon public key</label><input id="setup-key" placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."/></div>
+            <button class="btn btn-black btn-full" style="margin-top:8px" onclick="saveSetup()">CONNECT DATABASE</button>
+            <div id="setup-err" style="font-size:12px;color:#e05050;text-align:center;margin-top:8px;display:none"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════
+     SIGNUP
+══════════════════════════ -->
+<div class="view" id="view-signup">
+  <div class="signup-page">
+    <div class="signup-hero">
+      <svg class="signup-frog" viewBox="0 0 100 100" fill="none">
+        <path d="M15 60 Q20 35 45 30 Q38 50 55 48 Q48 60 60 58 Q65 45 80 30 Q85 28 88 32 Q88 36 82 42 Q70 55 62 70 Q55 80 48 78 Q35 76 28 68 Q20 72 15 60Z" fill="#2d6a2d"/>
+        <circle cx="76" cy="26" r="7" fill="#2d6a2d"/>
+        <circle cx="76" cy="26" r="3" fill="white"/>
+      </svg>
+      <div class="signup-eyebrow">Stop overthinking.</div>
+      <h1 class="signup-h1">Take the leap.<br/>Shape the app.</h1>
+      <p class="signup-sub">Join our beta tester list. We'll send you surveys as we build — your feedback determines what ships.</p>
+    </div>
+    <div class="signup-card" id="signup-box"></div>
+  </div>
+</div>
+
+<!-- ══════════════════════════
+     SURVEY RESPONSE
+══════════════════════════ -->
+<div class="view" id="view-survey">
+  <div class="survey-page">
+    <div class="survey-inner" id="survey-wrap"></div>
+  </div>
+</div>
+
+<!-- ══════════════════════════
+     LOCK
+══════════════════════════ -->
+<div class="view" id="view-lock">
+  <div style="flex:1;display:flex;align-items:center;justify-content:center;padding:40px 20px">
+    <div class="lock-wrap">
+      <svg class="lock-frog" viewBox="0 0 100 100" fill="none">
+        <path d="M15 60 Q20 35 45 30 Q38 50 55 48 Q48 60 60 58 Q65 45 80 30 Q85 28 88 32 Q88 36 82 42 Q70 55 62 70 Q55 80 48 78 Q35 76 28 68 Q20 72 15 60Z" fill="#2d6a2d"/>
+        <circle cx="76" cy="26" r="7" fill="#2d6a2d"/>
+        <circle cx="76" cy="26" r="3" fill="white"/>
+      </svg>
+      <div class="lock-title">Admin portal</div>
+      <div class="lock-sub">Enter your password to manage your beta testers and surveys.</div>
+      <input class="lock-in" type="password" id="admin-pw" placeholder="••••••••" onkeydown="if(event.key==='Enter')checkPw()"/>
+      <div class="pw-err" id="pw-err">Incorrect password. Try again.</div>
+      <button class="btn btn-black btn-full" style="margin-top:14px" onclick="checkPw()">CONTINUE</button>
+      <div class="lock-hint">Default password: leap2025</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════
+     ADMIN
+══════════════════════════ -->
+<div class="view" id="view-admin">
+  <div class="sidebar">
+    <div class="sb-header">
+      <div class="sb-logo">
+        <svg class="sb-logo-img" viewBox="0 0 100 100" fill="none">
+          <path d="M15 60 Q20 35 45 30 Q38 50 55 48 Q48 60 60 58 Q65 45 80 30 Q85 28 88 32 Q88 36 82 42 Q70 55 62 70 Q55 80 48 78 Q35 76 28 68 Q20 72 15 60Z" fill="#2d6a2d"/>
+          <circle cx="76" cy="26" r="7" fill="#2d6a2d"/>
+          <circle cx="76" cy="26" r="3" fill="white"/>
+        </svg>
+        <div>
+          <div class="sb-logo-name">Leap</div>
+          <span class="sb-logo-tag">Beta Admin</span>
+        </div>
+      </div>
+    </div>
+    <div class="sb-section">Overview</div>
+    <button class="sb-btn active" id="sb-overview" onclick="showPanel('overview')">
+      <svg class="sb-icon" viewBox="0 0 16 16" fill="currentColor"><rect x="1" y="1" width="6" height="6" rx="1.5"/><rect x="9" y="1" width="6" height="6" rx="1.5"/><rect x="1" y="9" width="6" height="6" rx="1.5"/><rect x="9" y="9" width="6" height="6" rx="1.5"/></svg>Overview
+    </button>
+    <button class="sb-btn" id="sb-testers" onclick="showPanel('testers')">
+      <svg class="sb-icon" viewBox="0 0 16 16" fill="currentColor"><circle cx="8" cy="5" r="3"/><path d="M2 13c0-3.3 2.7-6 6-6s6 2.7 6 6H2z"/></svg>Beta Testers
+    </button>
+    <div class="sb-section">Surveys</div>
+    <button class="sb-btn" id="sb-builder" onclick="showPanel('builder')">
+      <svg class="sb-icon" viewBox="0 0 16 16" fill="currentColor"><path d="M3 3h10v2H3zm0 4h10v2H3zm0 4h6v2H3z"/></svg>Build Survey
+    </button>
+    <button class="sb-btn" id="sb-send" onclick="showPanel('send')">
+      <svg class="sb-icon" viewBox="0 0 16 16" fill="currentColor"><path d="M1 2l14 6-14 6V9.5l10-1.5-10-1.5V2z"/></svg>Send Survey
+    </button>
+    <button class="sb-btn" id="sb-responses" onclick="showPanel('responses')">
+      <svg class="sb-icon" viewBox="0 0 16 16" fill="currentColor"><path d="M2 4h12v2H2zm0 4h8v2H2zm0 4h5v2H2z"/></svg>Responses
+    </button>
+    <div class="sb-spacer"></div>
+    <div class="sb-bottom">
+      <button class="sb-btn" onclick="logout()">
+        <svg class="sb-icon" viewBox="0 0 16 16" fill="currentColor"><path d="M10 2H3a1 1 0 00-1 1v10a1 1 0 001 1h7v-2H4V4h6V2zm5 5.5l-4-3v2H6v2h5v2l4-3z"/></svg>Sign out
+      </button>
+    </div>
+  </div>
+
+  <div class="admin-main">
+    <div class="panel active" id="panel-overview">
+      <div class="page-hd">Overview</div>
+      <div class="page-sub">Your Leap beta program at a glance</div>
+      <div class="stats-row" id="ov-stats"></div>
+      <div class="ac">
+        <div class="ac-title">Recent signups</div>
+        <div class="ac-sub">Beta testers who joined your list</div>
+        <div id="ov-recent"></div>
+      </div>
+    </div>
+
+    <div class="panel" id="panel-testers">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
+        <div class="page-hd">Beta Testers</div>
+        <button class="ab ab-sm" onclick="exportTesters()">Export CSV</button>
+      </div>
+      <div class="page-sub" id="testers-sub"></div>
+      <div id="testers-table"></div>
+    </div>
+
+    <div class="panel" id="panel-builder">
+      <div class="page-hd">Build a survey</div>
+      <div class="page-sub">Create questions to send to your beta testers</div>
+      <div class="ac">
+        <div class="two-af">
+          <div class="af"><label>Survey name</label><input id="b-name" placeholder="e.g. Week 1 Feedback"/></div>
+          <div class="af"><label>Short description</label><input id="b-desc" placeholder="Shown to testers at the top"/></div>
+        </div>
+        <div class="divider"></div>
+        <div style="font-size:13px;font-weight:700;margin-bottom:10px">Questions <span id="q-count" style="font-weight:400;color:var(--text-muted)">(0)</span></div>
+        <div id="q-list"></div>
+        <div class="ac ac-dashed" style="margin-top:8px">
+          <div style="font-size:13px;font-weight:700;margin-bottom:12px">Add a question</div>
+          <div class="two-af">
+            <div class="af" style="margin-bottom:0"><label>Question text</label><input id="nq-text" placeholder="What do you think of the one-take rule?"/></div>
+            <div class="af" style="margin-bottom:0"><label>Answer type</label>
+              <select id="nq-type" onchange="onQType()">
+                <option value="text">Open text</option>
+                <option value="rating">Rating (1–5)</option>
+                <option value="scale">Scale (1–10)</option>
+                <option value="choice">Multiple choice</option>
+                <option value="yesno">Yes / No</option>
+              </select>
+            </div>
+          </div>
+          <div id="choice-area" style="display:none;margin-top:12px">
+            <div class="af"><label>Options</label><div id="opts-list" style="margin-bottom:8px"></div></div>
+            <div style="display:flex;gap:8px"><input id="nq-opt" class="af" style="margin-bottom:0;flex:1" placeholder="Add an option..."/><button class="ab ab-sm" onclick="addOpt()">+ Add</button></div>
+          </div>
+          <button class="ab ab-green ab-sm" style="margin-top:14px" onclick="addQuestion()">Add question</button>
+        </div>
+        <button class="ab ab-green" style="margin-top:12px" onclick="saveSurvey()">Save survey</button>
+      </div>
+      <div class="ac">
+        <div style="font-size:14px;font-weight:700;margin-bottom:14px">Saved surveys</div>
+        <div id="saved-list"></div>
+      </div>
+    </div>
+
+    <div class="panel" id="panel-send">
+      <div class="page-hd">Send survey</div>
+      <div class="page-sub">Select a survey and blast it to your beta testers</div>
+      <div class="ac">
+        <div class="af"><label>Which survey?</label>
+          <select id="blast-sv" onchange="onBlastSvChange(this.value)">
+            <option value="">— select a survey —</option>
+          </select>
+        </div>
+        <div id="blast-sv-info" style="font-size:12px;color:var(--text-muted);margin-bottom:16px"></div>
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+          <div style="font-size:13px;font-weight:700">Testers</div>
+          <div style="display:flex;gap:8px">
+            <button class="ab ab-sm" onclick="selAll()">Select all</button>
+            <button class="ab ab-sm" onclick="selNone()">Clear</button>
+          </div>
+        </div>
+        <div id="blast-list"></div>
+        <div style="font-size:12px;color:var(--text-muted);margin:10px 0 16px" id="blast-ct">0 selected</div>
+        <button class="ab ab-green" id="blast-go" onclick="doBlast()" disabled>Send survey</button>
+      </div>
+    </div>
+
+    <div class="panel" id="panel-responses">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
+        <div class="page-hd">Responses</div>
+        <button class="ab ab-green ab-sm" onclick="exportAll()">Export all to Excel</button>
+      </div>
+      <div class="page-sub">All survey responses from your beta testers</div>
+      <div id="resp-content"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ════════════════════════════════════════
+// CONFIG — direct REST API, no library needed
+// ════════════════════════════════════════
+let CFG = { url: '', key: '' };
+
+function getConfig() {
+  try {
+    const c = localStorage.getItem('leap_config');
+    return c ? JSON.parse(c) : null;
+  } catch(e){ return null; }
+}
+
+function initSupabase(url, key) {
+  CFG = { url: url.replace(/\/$/, ''), key };
+  return true;
+}
+
+async function sbFetch(path, opts={}) {
+  const headers = { apikey: CFG.key, Authorization: 'Bearer '+CFG.key, ...opts.headers };
+  const r = await fetch(CFG.url+'/rest/v1/'+path, { ...opts, headers });
+  let data = null;
+  try { data = await r.json(); } catch(e){}
+  if(!r.ok) return { data: null, error: data };
+  return { data, error: null };
+}
+
+function buildQS(opts) {
+  let q = 'select='+(opts.select||'*');
+  if(opts.eq) Object.entries(opts.eq).forEach(([k,v])=>{ q+=`&${k}=eq.${encodeURIComponent(v)}`; });
+  if(opts.order) q+=`&order=${opts.order}`;
+  if(opts.limit) q+=`&limit=${opts.limit}`;
+  return q;
+}
+
+const SB = {
+  from(table) {
+    const self = {
+      _sel:'*', _eq:null, _order:null, _limit:null, _single:false,
+      select(s){ self._sel=s; return self; },
+      eq(k,v){ self._eq={[k]:v}; return self; },
+      order(col,opts={}){ self._order=col+(opts.ascending===false?'.desc':'.asc'); return self; },
+      limit(n){ self._limit=n; return self; },
+      single(){ self._single=true; return self; },
+      then(fn) {
+        const qs = buildQS({select:self._sel, eq:self._eq, order:self._order, limit:self._limit});
+        const hdrs = self._single ? {'Accept':'application/vnd.pgrst.object+json'} : {};
+        return sbFetch(table+'?'+qs, {headers:hdrs}).then(fn);
+      },
+      insert(row) { return sbFetch(table, {method:'POST',headers:{'Content-Type':'application/json','Prefer':'return=representation'},body:JSON.stringify(row)}); },
+      update(row) { return { eq(k,v){ const qs=`${k}=eq.${encodeURIComponent(v)}`; return sbFetch(table+'?'+qs,{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify(row)}); } }; },
+      delete() { return { eq(k,v){ const qs=`${k}=eq.${encodeURIComponent(v)}`; return sbFetch(table+'?'+qs,{method:'DELETE'}); } }; }
+    };
+    return self;
+  }
+};
+
+// ════════════════════════════════════════
+// UTILS
+// ════════════════════════════════════════
+function uid(){ return crypto.randomUUID ? crypto.randomUUID() : '_'+Math.random().toString(36).slice(2)+Date.now().toString(36); }
+function today(){ return new Date().toISOString().slice(0,10); }
+function inits(n){ return (n||'?').trim().split(' ').map(x=>x[0]||'').join('').slice(0,2).toUpperCase(); }
+function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+function toast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.classList.add('show');
+  clearTimeout(t._t); t._t=setTimeout(()=>t.classList.remove('show'),2800);
+}
+
+function loading(show, msg='Loading...'){
+  const el=document.getElementById('loader');
+  document.getElementById('loader-msg').textContent=msg;
+  el.classList.toggle('show', show);
+}
+
+function showView(name){
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+  document.getElementById('view-'+name)?.classList.add('active');
+}
+
+// ════════════════════════════════════════
+// SETUP
+// ════════════════════════════════════════
+async function saveSetup(){
+  const url = document.getElementById('setup-url')?.value.trim();
+  const key = document.getElementById('setup-key')?.value.trim();
+  const errEl = document.getElementById('setup-err');
+  errEl.style.display='none';
+
+  if(!url||!url.startsWith('https')){errEl.textContent='Enter a valid Supabase URL.';errEl.style.display='block';return;}
+  if(!key||key.length<20){errEl.textContent='Enter a valid anon key.';errEl.style.display='block';return;}
+
+  loading(true,'Testing connection...');
+  if(!initSupabase(url,key)){loading(false);errEl.textContent='Could not connect. Check your keys.';errEl.style.display='block';return;}
+
+  // Test connection by querying testers directly
+  let testOk = false, testErr = null;
+  try {
+    const r = await fetch(url.replace(/\/$/,'')+'/rest/v1/testers?select=id&limit=1', {
+      headers: { apikey: key, Authorization: 'Bearer '+key }
+    });
+    const d = await r.json();
+    if(r.ok) testOk = true; else testErr = d;
+  } catch(e){ testErr = {message: e.message}; }
+  const error = testOk ? null : (testErr || {message:'Could not reach database'});
+  loading(false);
+  if(error){
+    errEl.textContent='Connection failed: '+error.message+'. Make sure you ran the SQL setup.';
+    errEl.style.display='block'; return;
+  }
+
+  localStorage.setItem('leap_config', JSON.stringify({url, key}));
+  toast('Connected! Welcome to Leap admin.');
+  showView('signup');
+  renderSignup();
+}
+
+// ════════════════════════════════════════
+// SIGNUP FLOW
+// ════════════════════════════════════════
+let sig={step:1,data:{}};
+
+function renderSignup(){
+  const el=document.getElementById('signup-box');
+  if(!el) return;
+  if(sig.step===1) el.innerHTML=s1();
+  if(sig.step===2) el.innerHTML=s2();
+  if(sig.step===3) el.innerHTML=sDone();
+}
+
+function s1(){ return `
+  <div class="signup-card-hd">Join the beta</div>
+  <div class="signup-card-sub">Drop your details — we'll send you surveys as we build Leap.</div>
+  <div class="steps"><div class="step-dot on"></div><div class="step-dot"></div></div>
+  <div class="two-f">
+    <div class="f" id="fg-fn"><label>First name</label><input id="sf-fn" placeholder="First" value="${esc(sig.data.fn||'')}"/><div class="f-err">Required</div></div>
+    <div class="f" id="fg-ln"><label>Last name</label><input id="sf-ln" placeholder="Last" value="${esc(sig.data.ln||'')}"/><div class="f-err">Required</div></div>
+  </div>
+  <div class="f" id="fg-em"><label>Email</label><input id="sf-em" type="email" placeholder="your@email.com" value="${esc(sig.data.em||'')}"/><div class="f-err">Valid email required</div></div>
+  <div class="f"><label>Year / role</label>
+    <select id="sf-yr">
+      <option value="">— optional —</option>
+      ${['Freshman','Sophomore','Junior','Senior','Grad student','Faculty / Staff','Not at IU'].map(o=>`<option value="${o}" ${sig.data.yr===o?'selected':''}>${o}</option>`).join('')}
+    </select>
+  </div>
+  <button class="btn btn-black btn-full" onclick="sNext()">CONTINUE</button>
+  <div style="text-align:center;font-size:12px;color:var(--text-muted);margin-top:14px">
+    Already signed up? <button onclick="goAdmin()" style="background:none;border:none;color:var(--green);font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;font-size:12px">Admin →</button>
+  </div>`; }
+
+function s2(){ return `
+  <div class="signup-card-hd">One more thing</div>
+  <div class="signup-card-sub">Helps us make challenges that actually work for you.</div>
+  <div class="steps"><div class="step-dot on"></div><div class="step-dot on"></div></div>
+  <div class="f"><label>Do you post videos regularly?</label>
+    <select id="sf-posts">
+      <option value="">— select —</option>
+      ${['Daily','A few times a week','Rarely','Never — I mostly scroll'].map(o=>`<option value="${o}" ${sig.data.posts===o?'selected':''}>${o}</option>`).join('')}
+    </select>
+  </div>
+  <div class="f"><label>What excites you most about Leap?</label>
+    <select id="sf-exc">
+      <option value="">— select —</option>
+      ${["Daily challenges","No pressure to be perfect","Streaks and jump height","Seeing friends' videos","Being an early user","Just curious"].map(o=>`<option value="${o}" ${sig.data.exc===o?'selected':''}>${o}</option>`).join('')}
+    </select>
+  </div>
+  <div class="f"><label>Anything else? (optional)</label>
+    <input id="sf-note" placeholder="What you hope Leap becomes..." value="${esc(sig.data.note||'')}"/>
+  </div>
+  <div style="background:var(--green-light);border-radius:var(--r-sm);padding:10px 14px;font-size:12px;color:var(--text-muted);margin-bottom:14px">
+    Signing up as <strong style="color:var(--text)">${esc(sig.data.fn)} ${esc(sig.data.ln)}</strong> · ${esc(sig.data.em)}
+  </div>
+  <button class="btn btn-black btn-full" id="sf-sub" onclick="sSubmit()">CONTINUE</button>
+  <button class="back-link" onclick="sig.step=1;renderSignup()">← Back</button>`; }
+
+function sDone(){ return `
+  <div class="done-wrap">
+    <div class="done-circle">
+      <svg width="26" height="26" viewBox="0 0 100 100" fill="none">
+        <path d="M15 60 Q20 35 45 30 Q38 50 55 48 Q48 60 60 58 Q65 45 80 30 Q85 28 88 32 Q88 36 82 42 Q70 55 62 70 Q55 80 48 78 Q35 76 28 68 Q20 72 15 60Z" fill="#2d6a2d"/>
+        <circle cx="76" cy="26" r="7" fill="#2d6a2d"/>
+        <circle cx="76" cy="26" r="3" fill="white"/>
+      </svg>
+    </div>
+    <div class="done-title">You're in, ${esc(sig.data.fn)}.</div>
+    <div class="done-sub">We'll send surveys to <strong>${esc(sig.data.em)}</strong> as we build Leap.<br/>Do it once. Post it fast.</div>
+    <button class="text-btn" onclick="sigAgain()">Add another tester</button>
+  </div>`; }
+
+function sNext(){
+  const fn=document.getElementById('sf-fn')?.value.trim();
+  const ln=document.getElementById('sf-ln')?.value.trim();
+  const em=document.getElementById('sf-em')?.value.trim();
+  let ok=true;
+  ['fg-fn','fg-ln','fg-em'].forEach(id=>document.getElementById(id)?.classList.remove('err'));
+  if(!fn){document.getElementById('fg-fn')?.classList.add('err');ok=false;}
+  if(!ln){document.getElementById('fg-ln')?.classList.add('err');ok=false;}
+  if(!em||!em.includes('@')){document.getElementById('fg-em')?.classList.add('err');ok=false;}
+  if(!ok) return;
+  sig.data={...sig.data,fn,ln,em,yr:document.getElementById('sf-yr')?.value||''};
+  sig.step=2; renderSignup();
+}
+
+async function sSubmit(){
+  const btn=document.getElementById('sf-sub');
+  if(btn){btn.disabled=true;btn.textContent='SAVING...';}
+  sig.data.posts=document.getElementById('sf-posts')?.value||'';
+  sig.data.exc=document.getElementById('sf-exc')?.value||'';
+  sig.data.note=document.getElementById('sf-note')?.value.trim()||'';
+
+  const {error} = await SB.from('testers').insert({
+    name: sig.data.fn+' '+sig.data.ln,
+    fn: sig.data.fn, ln: sig.data.ln,
+    email: sig.data.em, yr: sig.data.yr||'',
+    posts: sig.data.posts||'', exc: sig.data.exc||'',
+    note: sig.data.note||'', joined: today()
+  });
+
+  if(btn){btn.disabled=false;btn.textContent='CONTINUE';}
+
+  if(error){
+    if(error.code==='23505'){
+      // unique violation = already signed up
+      const d=document.createElement('div');
+      d.style.cssText='font-size:12px;color:#e05050;text-align:center;margin-top:10px';
+      d.textContent='This email is already signed up!';
+      btn?.parentNode?.appendChild(d);
+    } else {
+      toast('Error: '+error.message);
+    }
+    return;
+  }
+  sig.step=3; renderSignup();
+}
+
+function sigAgain(){ sig={step:1,data:{}}; renderSignup(); }
+
+// ════════════════════════════════════════
+// SURVEY RESPONSE PAGE
+// ════════════════════════════════════════
+let activeSV=null, svAnswers={};
+
+function showSurveyPage(surveyId, testerId){
+  // Load survey from DB
+  loading(true,'Loading survey...');
+  SB.from('surveys').select('*').eq('id',surveyId).single().then(({data,error})=>{
+    loading(false);
+    if(error||!data){toast('Survey not found');return;}
+    activeSV={s:data,testerId};svAnswers={};
+    document.getElementById('survey-wrap').innerHTML=renderSVPage(data);
+    showView('survey');
+  });
+}
+
+function renderSVPage(s){
+  const qs = typeof s.questions==='string' ? JSON.parse(s.questions) : s.questions;
+  return `
+  <div class="survey-hdr">
+    <div class="survey-tag"><span class="live-dot"></span>Leap Beta Survey</div>
+    <h2>${esc(s.name)}</h2>
+    ${s.description?`<p>${esc(s.description)}</p>`:''}
+  </div>
+  ${qs.map((q,i)=>`
+  <div class="sv-card" id="sq-${i}">
+    <div class="q-num-tag">Question ${i+1} of ${qs.length}</div>
+    <div class="q-text">${esc(q.text)}</div>
+    ${renderQInput(q,i)}
+  </div>`).join('')}
+  <button class="btn btn-black btn-full" style="max-width:420px;margin:8px auto 0;display:block" onclick="submitSV()">SUBMIT →</button>
+  <div id="sv-err" style="font-size:12px;color:#e05050;text-align:center;margin-top:10px"></div>`;
+}
+
+function renderQInput(q,i){
+  if(q.type==='text') return `<textarea class="q-textarea" id="qa-${i}" placeholder="Your answer..."></textarea>`;
+  if(q.type==='rating') return `<div class="rating-row">${[1,2,3,4,5].map(n=>`<button class="r-btn" onclick="pickA(${i},'${n}',this,'r-btn')">${n}</button>`).join('')}</div><div class="rating-labels"><span>Not at all</span><span>Absolutely</span></div>`;
+  if(q.type==='scale') return `<div class="scale-row">${[1,2,3,4,5,6,7,8,9,10].map(n=>`<button class="sc-btn" onclick="pickA(${i},'${n}',this,'sc-btn')">${n}</button>`).join('')}</div><div class="rating-labels"><span>1 — not at all</span><span>10 — absolutely</span></div>`;
+  if(q.type==='yesno') return `<div class="choice-list"><button class="c-btn" onclick="pickA(${i},'Yes',this,'c-btn')">Yes</button><button class="c-btn" onclick="pickA(${i},'No',this,'c-btn')">No</button></div>`;
+  if(q.type==='choice') return `<div class="choice-list">${(q.options||[]).map(o=>`<button class="c-btn" onclick="pickA(${i},'${esc(o)}',this,'c-btn')">${esc(o)}</button>`).join('')}</div>`;
+  return '';
+}
+
+function pickA(qi,val,btn,cls){
+  svAnswers[qi]=val;
+  btn.closest('.sv-card').querySelectorAll('.'+cls).forEach(b=>b.classList.remove('sel'));
+  btn.classList.add('sel');
+}
+
+async function submitSV(){
+  if(!activeSV) return;
+  const {s,testerId}=activeSV;
+  const qs = typeof s.questions==='string' ? JSON.parse(s.questions) : s.questions;
+  const answers={};let ok=true;
+  qs.forEach((q,i)=>{
+    if(q.type==='text'){answers[i]=document.getElementById('qa-'+i)?.value.trim()||'';}
+    else{answers[i]=svAnswers[i]||'';}
+    if(!answers[i]) ok=false;
+  });
+  if(!ok){document.getElementById('sv-err').textContent='Please answer all questions before submitting.';return;}
+
+  loading(true,'Submitting...');
+  const testerRes = testerId ? await SB.from('testers').select('*').eq('id',testerId).single() : {data:null};
+  const tester = testerRes.data;
+
+  const {error} = await SB.from('responses').insert({
+    survey_id: s.id, survey_name: s.name,
+    tester_id: testerId||null, tester_name: tester?.name||'Anonymous',
+    email: tester?.email||'', date: today(), answers
+  });
+
+  if(!error){
+    await SB.from('surveys').update({responses: (s.responses||0)+1}).eq('id',s.id);
+  }
+  loading(false);
+
+  if(error){toast('Error submitting: '+error.message);return;}
+
+  document.getElementById('survey-wrap').innerHTML=`
+  <div style="text-align:center;padding:60px 20px">
+    <svg style="width:60px;height:60px;margin:0 auto 20px;display:block" viewBox="0 0 100 100" fill="none">
+      <path d="M15 60 Q20 35 45 30 Q38 50 55 48 Q48 60 60 58 Q65 45 80 30 Q85 28 88 32 Q88 36 82 42 Q70 55 62 70 Q55 80 48 78 Q35 76 28 68 Q20 72 15 60Z" fill="#2d6a2d"/>
+      <circle cx="76" cy="26" r="7" fill="#2d6a2d"/><circle cx="76" cy="26" r="3" fill="white"/>
+    </svg>
+    <div style="font-size:26px;font-weight:900;letter-spacing:-0.5px;margin-bottom:10px">Thanks${tester?' '+tester.fn:''}.</div>
+    <div style="font-size:15px;color:var(--text-muted);line-height:1.6">Your feedback shapes Leap.<br/>We'll be in touch soon.</div>
+    <button onclick="showView('signup')" class="btn btn-green" style="margin-top:28px">Back to home</button>
+  </div>`;
+}
+
+// ════════════════════════════════════════
+// ADMIN
+// ════════════════════════════════════════
+const PW='leap2025';
+let authed=false;
+
+function goAdmin(){
+  if(authed){showView('admin');renderOverview();}
+  else showView('lock');
+}
+function checkPw(){
+  const v=document.getElementById('admin-pw')?.value;
+  if(v===PW){authed=true;document.getElementById('admin-pw').value='';showView('admin');renderOverview();}
+  else document.getElementById('pw-err').style.display='block';
+}
+function logout(){authed=false;showView('signup');}
+
+function showPanel(name){
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.sb-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('panel-'+name)?.classList.add('active');
+  document.getElementById('sb-'+name)?.classList.add('active');
+  if(name==='overview') renderOverview();
+  if(name==='testers') renderTesters();
+  if(name==='builder') renderBuilder();
+  if(name==='send') renderSend();
+  if(name==='responses') renderResponses();
+}
+
+// OVERVIEW
+async function renderOverview(){
+  loading(true);
+  const trR = await SB.from('testers').select('*').order('joined',{ascending:false});
+  const srR = await SB.from('surveys').select('*');
+  const rrR = await SB.from('responses').select('id');
+  loading(false);
+  const testers=trR.data||[], surveys=srR.data||[], responses=rrR.data||[];
+  const sent=surveys.reduce((a,s)=>a+(s.sent||0),0);
+  const rate=sent?Math.round(responses.length/sent*100):0;
+
+  document.getElementById('ov-stats').innerHTML=`
+    <div class="stat"><div class="stat-label">Beta Testers</div><div class="stat-val">${testers.length}</div><div class="stat-sub">on mailing list</div></div>
+    <div class="stat"><div class="stat-label">Surveys</div><div class="stat-val">${surveys.length}</div><div class="stat-sub">created</div></div>
+    <div class="stat"><div class="stat-label">Responses</div><div class="stat-val">${responses.length}</div><div class="stat-sub">total collected</div></div>
+    <div class="stat"><div class="stat-label">Response Rate</div><div class="stat-val">${sent?rate+'%':'—'}</div><div class="stat-sub">${sent} sent</div></div>`;
+
+  const recent=testers.slice(0,6);
+  document.getElementById('ov-recent').innerHTML=recent.length===0
+    ?'<div class="empty">No beta testers yet — share your signup link!</div>'
+    :recent.map(m=>`
+    <div style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--border)">
+      <div class="av">${inits(m.name)}</div>
+      <div style="flex:1"><div style="font-size:13px;font-weight:600">${esc(m.name)}</div><div style="font-size:12px;color:var(--text-muted)">${esc(m.email)}${m.yr?' · '+esc(m.yr):''}</div></div>
+      <span class="badge b-gray">${m.joined}</span>
+    </div>`).join('');
+}
+
+// TESTERS
+async function renderTesters(){
+  loading(true);
+  const {data:t=[]}=await SB.from('testers').select('*').order('joined',{ascending:false});
+  loading(false);
+  document.getElementById('testers-sub').textContent=t.length+' tester'+(t.length!==1?'s':'')+' on the mailing list';
+  document.getElementById('testers-table').innerHTML=t.length===0
+    ?'<div class="ac"><div class="empty">No testers yet. Share the signup page!</div></div>'
+    :`<div class="tbl-wrap"><table>
+    <thead><tr><th>Name</th><th>Email</th><th>Year</th><th>Posts videos</th><th>Most excited about</th><th>Joined</th><th></th></tr></thead>
+    <tbody>${t.map(m=>`<tr>
+      <td><div style="display:flex;align-items:center;gap:8px"><div class="av">${inits(m.name)}</div><strong>${esc(m.name)}</strong></div></td>
+      <td style="color:var(--text-muted)">${esc(m.email)}</td>
+      <td>${m.yr?`<span class="badge b-gray">${esc(m.yr)}</span>`:'—'}</td>
+      <td style="color:var(--text-muted)">${esc(m.posts||'—')}</td>
+      <td style="max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--text-muted)">${esc(m.exc||'—')}</td>
+      <td style="color:var(--text-muted)">${m.joined}</td>
+      <td><button class="ab ab-sm ab-danger" onclick="rmTester('${m.id}')">Remove</button></td>
+    </tr>`).join('')}
+    </tbody></table></div>`;
+}
+async function rmTester(id){
+  if(!confirm('Remove this tester?')) return;
+  loading(true);
+  await SB.from('testers').delete().eq('id',id);
+  loading(false);
+  toast('Tester removed'); renderTesters(); renderOverview();
+}
+
+// BUILDER
+let bQs=[],bOpts=[];
+function onQType(){ document.getElementById('choice-area').style.display=document.getElementById('nq-type')?.value==='choice'?'block':'none'; }
+function addOpt(){
+  const v=document.getElementById('nq-opt')?.value.trim();
+  if(!v){toast('Enter an option');return;}
+  if(bOpts.includes(v)){toast('Already added');return;}
+  bOpts.push(v); document.getElementById('nq-opt').value=''; refreshOpts();
+}
+function removeOpt(i){ bOpts.splice(i,1); refreshOpts(); }
+function refreshOpts(){
+  document.getElementById('opts-list').innerHTML=bOpts.map((o,i)=>`<span class="chip">${esc(o)}<button class="chip-rm" onclick="removeOpt(${i})">×</button></span>`).join('');
+}
+function addQuestion(){
+  const text=document.getElementById('nq-text')?.value.trim();
+  const type=document.getElementById('nq-type')?.value||'text';
+  if(!text){toast('Enter a question');return;}
+  if(type==='choice'&&bOpts.length<2){toast('Add at least 2 options');return;}
+  bQs.push({text,type,options:[...bOpts]});
+  document.getElementById('nq-text').value='';
+  document.getElementById('nq-type').value='text';
+  bOpts=[]; onQType(); refreshQList();
+}
+function removeQ(i){ bQs.splice(i,1); refreshQList(); }
+function refreshQList(){
+  document.getElementById('q-count').textContent='('+bQs.length+')';
+  document.getElementById('q-list').innerHTML=bQs.length===0
+    ?'<div style="font-size:13px;color:var(--text-muted);margin-bottom:10px">No questions yet.</div>'
+    :bQs.map((q,i)=>`<div class="q-item-a"><div class="q-n">${i+1}</div><div style="flex:1"><div style="font-size:13px;font-weight:600">${esc(q.text)}</div><div style="font-size:11px;color:var(--text-muted);margin-top:2px">${q.type==='choice'?'Choice: '+q.options.join(', '):q.type==='yesno'?'Yes / No':q.type==='rating'?'Rating 1–5':q.type==='scale'?'Scale 1–10':'Open text'}</div></div><button class="ab ab-sm ab-danger" onclick="removeQ(${i})">×</button></div>`).join('');
+}
+async function saveSurvey(){
+  const name=document.getElementById('b-name')?.value.trim();
+  const desc=document.getElementById('b-desc')?.value.trim();
+  if(!name){toast('Give the survey a name');return;}
+  if(bQs.length===0){toast('Add at least one question');return;}
+  loading(true,'Saving...');
+  const {error}=await SB.from('surveys').insert({name,description:desc,questions:bQs,created:today(),sent:0,responses:0});
+  loading(false);
+  if(error){toast('Error: '+error.message);return;}
+  bQs=[];bOpts=[];
+  document.getElementById('b-name').value='';
+  document.getElementById('b-desc').value='';
+  refreshQList(); refreshSaved(); toast('Survey saved!');
+}
+async function deleteSurvey(id){
+  if(!confirm('Delete this survey?')) return;
+  loading(true);
+  await SB.from('surveys').delete().eq('id',id);
+  loading(false); refreshSaved(); toast('Deleted');
+}
+async function refreshSaved(){
+  const sv4=await SB.from('surveys').select('*').order('created',{ascending:false});
+  const rv4=await SB.from('responses').select('survey_id');
+  const surveys=sv4.data||[], responses=rv4.data||[];
+  const el=document.getElementById('saved-list'); if(!el) return;
+  el.innerHTML=surveys.length===0
+    ?'<div style="font-size:13px;color:var(--text-muted)">None yet.</div>'
+    :surveys.map(s=>{
+      const cnt=responses.filter(r=>r.survey_id===s.id).length;
+      return`<div class="sv-row">
+        <div style="flex:1"><div style="font-size:13px;font-weight:600">${esc(s.name)}</div><div style="font-size:12px;color:var(--text-muted)">${(s.questions||[]).length} questions${s.description?' · '+esc(s.description):''}</div></div>
+        <span class="badge b-green">${cnt} resp.</span>
+        <button class="ab ab-sm" style="margin-left:8px" onclick="goSend('${s.id}')">Send ↗</button>
+        <button class="ab ab-sm ab-danger" onclick="deleteSurvey('${s.id}')">Delete</button>
+      </div>`;
+    }).join('');
+}
+function renderBuilder(){ refreshQList(); refreshSaved(); }
+
+// SEND
+let blastId=null, blastSel=[], _allTesters=[];
+async function renderSend(){
+  loading(true);
+  const svRes = await SB.from('surveys').select('*');
+  const tRes = await SB.from('testers').select('*');
+  const surveys = svRes.data||[];
+  const testers = tRes.data||[];
+  loading(false);
+  _allTesters=testers;
+  const sel=document.getElementById('blast-sv');
+  if(sel){sel.innerHTML='<option value="">— select a survey —</option>'+surveys.map(s=>`<option value="${s.id}">${esc(s.name)}</option>`).join('');if(blastId)sel.value=blastId;}
+  renderBList();
+}
+function onBlastSvChange(val){
+  blastId=val||null; blastSel=[];
+  document.getElementById('blast-sv-info').textContent='';
+  document.getElementById('blast-sv-info').textContent='';
+  renderBList();
+}
+function renderBList(){
+  const t=_allTesters;
+  document.getElementById('blast-list').innerHTML=t.length===0
+    ?'<div style="font-size:13px;color:var(--text-muted)">No testers yet.</div>'
+    :t.map(m=>`<div class="blast-row"><input type="checkbox" id="bc-${m.id}" ${blastSel.includes(m.id)?'checked':''} onchange="toggleB('${m.id}')"/><div class="av" style="width:26px;height:26px;font-size:10px">${inits(m.name)}</div><div style="flex:1"><div style="font-size:13px;font-weight:600">${esc(m.name)}</div><div style="font-size:11px;color:var(--text-muted)">${esc(m.email)}</div></div>${m.yr?`<span class="badge b-gray">${esc(m.yr)}</span>`:''}</div>`).join('');
+  updateBBtn();
+}
+function toggleB(id){ if(blastSel.includes(id))blastSel=blastSel.filter(x=>x!==id);else blastSel.push(id); updateBBtn(); }
+function selAll(){ blastSel=_allTesters.map(t=>t.id); renderBList(); }
+function selNone(){ blastSel=[]; renderBList(); }
+function updateBBtn(){
+  const n=blastSel.length;
+  document.getElementById('blast-ct').textContent=n+' selected';
+  const btn=document.getElementById('blast-go');
+  if(btn){btn.disabled=!blastId||n===0;btn.textContent='Send to '+n+' tester'+(n!==1?'s':'');}
+}
+async function doBlast(){
+  if(!blastId||!blastSel.length) return;
+  loading(true,'Sending...');
+  await SB.from('surveys').update({sent: blastSel.length}).eq('id',blastId);
+  loading(false);
+  const previewId=blastId, firstId=blastSel[0];
+  blastSel=[]; blastId=null;
+  toast('Survey queued!');
+  document.getElementById('blast-sv-info').innerHTML=`
+  <div style="margin-top:12px;background:var(--green-light);border:1.5px solid var(--green);border-radius:var(--r-sm);padding:14px 16px">
+    <div style="font-size:13px;font-weight:700;color:var(--green);margin-bottom:6px">✓ Sent!</div>
+    <div style="font-size:12px;color:var(--text-muted);margin-bottom:10px">Share this survey link with your testers or preview it now:</div>
+    <button onclick="showSurveyPage('${previewId}','${firstId}')" class="btn btn-green" style="font-size:13px;padding:9px 18px">Preview survey →</button>
+  </div>`;
+  renderBList();
+}
+function goSend(id){ blastId=id; blastSel=[]; showPanel('send'); }
+
+// RESPONSES
+async function renderResponses(){
+  loading(true);
+  const svRes2 = await SB.from('surveys').select('*');
+  const rRes2 = await SB.from('responses').select('*');
+  const surveys = svRes2.data||[];
+  const responses = rRes2.data||[];
+  loading(false);
+  const el=document.getElementById('resp-content');
+  if(!surveys.length||!responses.length){el.innerHTML='<div class="ac"><div class="empty">No responses yet. Build a survey and send it.</div></div>';return;}
+  el.innerHTML=surveys.map(s=>{
+    const rs=responses.filter(r=>r.survey_id===s.id);
+    if(!rs.length) return '';
+    const qs=typeof s.questions==='string'?JSON.parse(s.questions):s.questions||[];
+    const insights=qs.map((q,qi)=>{
+      if(q.type==='rating'||q.type==='scale'){
+        const vals=rs.map(r=>{const a=typeof r.answers==='string'?JSON.parse(r.answers):r.answers;return parseFloat(a[qi])||0;}).filter(v=>v>0);
+        const avg=vals.length?Math.round(vals.reduce((a,b)=>a+b,0)/vals.length*10)/10:0;
+        const max=q.type==='scale'?10:5;
+        return`<div style="margin-bottom:14px"><div style="font-size:11px;font-weight:700;letter-spacing:0.5px;text-transform:uppercase;color:var(--text-label);margin-bottom:6px">Q${qi+1}: ${esc(q.text)}</div><div style="display:flex;align-items:baseline;gap:8px"><span class="avg-big">${avg}</span><span style="font-size:13px;color:var(--text-muted)">/ ${max} avg · ${vals.length} resp.</span></div><div class="prog-t"><div class="prog-tf" style="width:${Math.round(avg/max*100)}%"></div></div></div>`;
+      }
+      if(q.type==='choice'||q.type==='yesno'){
+        const opts=q.type==='yesno'?['Yes','No']:q.options||[];
+        const counts={};opts.forEach(o=>counts[o]=0);
+        rs.forEach(r=>{const a=typeof r.answers==='string'?JSON.parse(r.answers):r.answers;const v=a[qi];if(v&&counts[v]!==undefined)counts[v]++;});
+        const total=rs.length||1;
+        return`<div style="margin-bottom:14px"><div style="font-size:11px;font-weight:700;letter-spacing:0.5px;text-transform:uppercase;color:var(--text-label);margin-bottom:8px">Q${qi+1}: ${esc(q.text)}</div>${opts.map(o=>`<div class="ins-bar-row"><div class="ins-bar-label">${esc(o)}</div><div class="ins-bar-track"><div class="ins-bar-fill" style="width:${Math.round(counts[o]/total*100)}%"></div></div><div class="ins-bar-ct">${counts[o]}</div></div>`).join('')}</div>`;
+      }
+      return '';
+    }).filter(Boolean).join('');
+
+    return`<div class="ac" style="margin-bottom:14px">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">
+        <div class="ac-title">${esc(s.name)}</div>
+        <div style="display:flex;gap:8px;align-items:center"><span class="badge b-green">${rs.length} response${rs.length!==1?'s':''}</span><button class="ab ab-sm" onclick="expSV('${s.id}')">Export</button></div>
+      </div>
+      <div class="ac-sub">${qs.length} questions</div>
+      ${insights?`<div style="background:var(--bg);border-radius:var(--r-sm);padding:16px;margin-bottom:16px;border:1px solid var(--border)">${insights}</div>`:''}
+      <div class="tbl-wrap"><table>
+        <thead><tr><th>Tester</th><th>Date</th>${qs.map((_,i)=>`<th>Q${i+1}</th>`).join('')}</tr></thead>
+        <tbody>${rs.map(r=>{
+          const a=typeof r.answers==='string'?JSON.parse(r.answers):r.answers;
+          return`<tr>
+            <td><div style="display:flex;align-items:center;gap:8px"><div class="av" style="width:26px;height:26px;font-size:10px">${inits(r.tester_name)}</div><strong>${esc(r.tester_name)}</strong></div></td>
+            <td style="color:var(--text-muted)">${r.date}</td>
+            ${qs.map((_,i)=>`<td style="max-width:130px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--text-muted)">${esc(a[i]||'—')}</td>`).join('')}
+          </tr>`;
+        }).join('')}
+        </tbody>
+      </table></div>
+    </div>`;
+  }).join('');
+}
+
+// EXPORT
+function dlCSV(rows,fname){
+  const csv=rows.map(r=>r.map(c=>`"${String(c||'').replace(/"/g,'""')}"`).join(',')).join('\n');
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));
+  a.download=fname; a.click();
+}
+async function exportTesters(){
+  const {data:t=[]}=await SB.from('testers').select('*');
+  dlCSV([['Name','Email','Year','Post frequency','Most excited about','Notes','Joined'],...t.map(x=>[x.name,x.email,x.yr,x.posts,x.exc,x.note,x.joined])],'leap-testers.csv');
+  toast('Exported!');
+}
+async function expSV(id){
+  const sRes=await SB.from('surveys').select('*').eq('id',id).single();
+  const rRes=await SB.from('responses').select('*').eq('survey_id',id);
+  const s=sRes.data, rs=rRes.data||[];
+  const qs=typeof s.questions==='string'?JSON.parse(s.questions):s.questions||[];
+  dlCSV([['Tester','Email','Date',...qs.map((q,i)=>'Q'+(i+1)+': '+q.text)],...rs.map(r=>{const a=typeof r.answers==='string'?JSON.parse(r.answers):r.answers;return[r.tester_name,r.email,r.date,...qs.map((_,i)=>a[i]||'')];})],
+    'leap-'+s.name.replace(/\s+/g,'-').toLowerCase()+'.csv');
+  toast('Exported!');
+}
+async function exportAll(){
+  const esvRes=await SB.from('surveys').select('*');
+  const erRes=await SB.from('responses').select('*');
+  const surveys=esvRes.data||[], responses=erRes.data||[];
+  if(!responses.length){toast('No responses yet');return;}
+  const maxQ=Math.max(...surveys.map(s=>(s.questions||[]).length),0);
+  dlCSV([['Survey','Tester','Email','Date',...Array.from({length:maxQ},(_,i)=>'Q'+(i+1))],...responses.map(r=>{
+    const sv=surveys.find(s=>s.id===r.survey_id);
+    const a=typeof r.answers==='string'?JSON.parse(r.answers):r.answers;
+    return[sv?.name||'',r.tester_name,r.email,r.date,...Array.from({length:maxQ},(_,i)=>a[i]||'')];
+  })],'leap-all-responses.csv');
+  toast('All responses exported!');
+}
+
+// ════════════════════════════════════════
+// INIT
+// ════════════════════════════════════════
+(function init(){
+  const config = getConfig();
+  if(config && config.url && config.key){
+    if(initSupabase(config.url, config.key)){
+      showView('signup');
+      renderSignup();
+    } else {
+      showView('setup');
+    }
+  } else {
+    showView('setup');
+  }
+})();
+</script>
+</body>
+</html>
